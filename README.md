@@ -7,3 +7,8 @@ All my projects on AVR-ATMEL.
 - Download and install AVRDUDESS (http://blog.zakkemble.co.uk/avrdudess-a-gui-for-avrdude/)
 - Download and install drivers for your programmer USBASP (http://www.fischl.de/usbasp/)
 
+
+## Install (Linux)
+- Install gcc-avr compiler `sudo apt install gcc-avr`
+- Install AVR C librairies `sudo apt install avr-libc binutils-avr`
+- Install AVRDUDE programmer `sudo apt install avrdude`
