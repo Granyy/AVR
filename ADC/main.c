@@ -45,8 +45,7 @@ void SEGMENT_config();
 void ADC_config();
 
 
-int main(void){
-	
+int main(void) {
 	struct DigitDisplay digitDisplay;
 	digitDisplay.rightDigit = digitCodeMap[17];
 	digitDisplay.rightDot = 0;
@@ -56,7 +55,6 @@ int main(void){
 	SEGMENT_config();
 	ADC_config();
 	
-	int i = 0;
 	float convValue = 0;
 	
 	while(1) {

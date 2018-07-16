@@ -1,27 +1,44 @@
-src=main
-avrType=attiny84
-avrFlashType=t84
-programmerDev=usb
-programmerType=usbasp
+TARGET=7_segments
+SRC=$(shell find . -name '*.c')
+OBJ=$(SRC:.c=.o)
 
-cflags=-g -Wall -Os
+CROSS=avr-
+CC=$(CROSS)gcc
+OBJCOPY=$(CROSS)objcopy
+SIZE=$(CROSS)size
 
-edit:
-	nano $(src).c
+AVRTYPE=attiny84
+CFLAGS=-g -Wall -Os -mmcu=$(AVRTYPE)
 
-clean: 
-	rm $(src).elf $(src).flash.hex $(src).o
-object:
-	avr-gcc $(cflags) -mmcu=$(avrType) -c -o $(src).o $(src).c
+AVRFLASH_TYPE=t84
+PROGRAMMER_DEV=usb
+PROGRAMMER_TYPE=usbasp
 
-elf: object
-	avr-gcc $(cflags) -mmcu=$(avrType) -o $(src).elf $(src).o
-	chmod a-x $(src).elf 2>&1
+all: $(TARGET).elf bin hex size
 
-hex: elf
-	avr-objcopy -j .text -j .data -O ihex $(src).elf $(src).flash.hex
+clean:
+	@echo " CLEAN"
+	@rm $(TARGET).elf $(TARGET).hex $(TARGET).bin $(OBJ)
 
-program: flash clean
+%.o: %.c
+	@echo " CC       $<"
+	@avr-gcc $(CFLAGS)  -o $@ -c $<
+
+
+$(TARGET).elf: $(OBJ)
+	@echo " LD       $@"
+	@$(CC) $(CFLAGS) -o $@ $(OBJ)
+
+hex: $(TARGET).elf
+	@echo " OBJCOPY  $(TARGET:.elf=.hex)"
+	@$(OBJCOPY) -j .text -j .data -O ihex $(TARGET).elf $(TARGET).hex
+
+bin: $(TARGET).elf
+	@echo " OBJCOPY  $(TARGET:.elf=.bin)"
+	@$(OBJCOPY) -j .text -j .data -O binary $(TARGET).elf $(TARGET).bin
+
+size:
+	@$(SIZE) --format=berkeley $(TARGET).elf
 
 flash: hex
-	avrdude -P$(programmerDev) -p$(avrFlashType) -c$(programmerType) -U flash:w:$(src).flash.hex
+	avrdude -P$(PROGRAMMER_DEV) -p$(AVRFLASH_TYPE) -c$(PROGRAMMER_TYPE) -U flash:w:$(TARGET).hex
